@@ -6,7 +6,7 @@ class ContactDiarySpec extends Specification {
 
     void 'Starting the application hooks up an sql connection with the SQLite jdbc driver'() {
         given:
-        String[] args = []
+        String[] args = ['test.db']
 
         when:
         ContactDiary.main(args)
@@ -15,7 +15,7 @@ class ContactDiarySpec extends Specification {
         noExceptionThrown()
 
         and:
-        File expectedDBFile = new File(ContactDiary.JDBC_PATH)
+        File expectedDBFile = new File(args[0])
         expectedDBFile.exists()
 
         cleanup:
