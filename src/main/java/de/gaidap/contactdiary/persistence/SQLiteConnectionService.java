@@ -13,7 +13,7 @@ import java.util.List;
 
 public class SQLiteConnectionService implements ConnectionService {
 
-    private static final Logger logger = LogManager.getLogger(ContactDiary.class);
+    private static final Logger logger = LogManager.getLogger(SQLiteConnectionService.class);
 
     private final String jdbcPath;
 

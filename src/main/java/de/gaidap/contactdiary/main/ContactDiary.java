@@ -1,5 +1,7 @@
 package de.gaidap.contactdiary.main;
 
+import de.gaidap.contactdiary.contact.ContactDTO;
+import de.gaidap.contactdiary.contact.ContactRepository;
 import de.gaidap.contactdiary.persistence.ConnectionService;
 import de.gaidap.contactdiary.persistence.SQLiteConnectionService;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +25,12 @@ public class ContactDiary {
         } else {
             setupDatabaseTables(connectionService, connection);
         }
+        ContactRepository contactRepository = new ContactRepository(connectionService);
+        List<ContactDTO> contacts = contactRepository.listAllContacts();
+        logger.debug("Fetched following Contacts from DB: ");
+        for (ContactDTO contact : contacts) {
+            logger.debug(contact);
+        }
     }
 
     private static String createJdbcPath(String[] args) {
@@ -38,12 +46,12 @@ public class ContactDiary {
     private static void setupDatabaseTables(final ConnectionService connectionService, final Connection connection) {
         final List<String> initialStatements = new ArrayList<>(3);
         initialStatements.add("CREATE TABLE IF NOT EXISTS " +
-                "ContactDate(ID INTEGER PRIMARY KEY AUTOINCREMENT, date DATE, UNIQUE(date));");
+                "ContactDateDTO(ID INTEGER PRIMARY KEY AUTOINCREMENT, cDate DATE);");
         initialStatements.add("CREATE TABLE IF NOT EXISTS " +
-                "Person(ID INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR, UNIQUE(name));");
+                "PersonDTO(ID INTEGER PRIMARY KEY AUTOINCREMENT, pName VARCHAR);");
         initialStatements.add("CREATE TABLE IF NOT EXISTS " +
-                "Contact(dateID INTEGER, personID INTEGER, FOREIGN KEY (dateID) REFERENCES ContactDate (dateID), "
-                + "FOREIGN KEY (personID) REFERENCES Person (personID), UNIQUE(dateID, personID));");
+                "ContactDTO(contactDateID INTEGER, personID INTEGER, FOREIGN KEY (contactDateID) REFERENCES ContactDateDTO (contactDateID), "
+                + "FOREIGN KEY (personID) REFERENCES PersonDTO (personID), UNIQUE(contactDateID, personID));");
         try {
             connectionService.bootstrapDatabase(connection, initialStatements);
         } catch (SQLException sqlException) {
