@@ -46,9 +46,9 @@ public class ContactDiary {
     private static void setupDatabaseTables(final ConnectionService connectionService, final Connection connection) {
         final List<String> initialStatements = new ArrayList<>(3);
         initialStatements.add("CREATE TABLE IF NOT EXISTS " +
-                "ContactDateDTO(ID INTEGER PRIMARY KEY AUTOINCREMENT, cDate DATE);");
+                "ContactDateDTO(ID INTEGER PRIMARY KEY AUTOINCREMENT, cDate DATE, UNIQUE(date));");
         initialStatements.add("CREATE TABLE IF NOT EXISTS " +
-                "PersonDTO(ID INTEGER PRIMARY KEY AUTOINCREMENT, pName VARCHAR);");
+                "PersonDTO(ID INTEGER PRIMARY KEY AUTOINCREMENT, pName VARCHAR, UNIQUE(pName));");
         initialStatements.add("CREATE TABLE IF NOT EXISTS " +
                 "ContactDTO(contactDateID INTEGER, personID INTEGER, FOREIGN KEY (contactDateID) REFERENCES ContactDateDTO (contactDateID), "
                 + "FOREIGN KEY (personID) REFERENCES PersonDTO (personID), UNIQUE(contactDateID, personID));");
