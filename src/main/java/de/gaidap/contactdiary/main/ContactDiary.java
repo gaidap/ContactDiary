@@ -1,6 +1,6 @@
 package de.gaidap.contactdiary.main;
 
-import de.gaidap.contactdiary.contact.ContactDTO;
+import de.gaidap.contactdiary.contact.Contact;
 import de.gaidap.contactdiary.contact.ContactRepository;
 import de.gaidap.contactdiary.persistence.ConnectionService;
 import de.gaidap.contactdiary.persistence.SQLiteConnectionService;
@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class ContactDiary {
 
@@ -26,11 +27,26 @@ public class ContactDiary {
             setupDatabaseTables(connectionService, connection);
         }
         ContactRepository contactRepository = new ContactRepository(connectionService);
-        List<ContactDTO> contacts = contactRepository.listAllContacts();
+        insertKontakte(contactRepository);
+        List<Contact> contacts = contactRepository.listAllContacts();
         logger.debug("Fetched following Contacts from DB: ");
-        for (ContactDTO contact : contacts) {
+        for (Contact contact : contacts) {
             logger.debug(contact);
         }
+    }
+
+    private static void insertKontakte(ContactRepository contactRepository) {
+        final Scanner scanner = new Scanner(System.in);
+        String input;
+        while (true) {
+            System.out.println("Wen haben Sie heute getroffen? Eingabe mit Enter beenden");
+            input = scanner.nextLine();
+            if (input.equals("")) {
+                break;
+            }
+            contactRepository.addContact(input);
+        }
+        scanner.close();
     }
 
     private static String createJdbcPath(String[] args) {
@@ -46,12 +62,12 @@ public class ContactDiary {
     private static void setupDatabaseTables(final ConnectionService connectionService, final Connection connection) {
         final List<String> initialStatements = new ArrayList<>(3);
         initialStatements.add("CREATE TABLE IF NOT EXISTS " +
-                "ContactDateDTO(ID INTEGER PRIMARY KEY AUTOINCREMENT, cDate DATE, UNIQUE(date));");
+                "ContactDate(ID INTEGER PRIMARY KEY AUTOINCREMENT, cDate DATE, UNIQUE(cDate));");
         initialStatements.add("CREATE TABLE IF NOT EXISTS " +
-                "PersonDTO(ID INTEGER PRIMARY KEY AUTOINCREMENT, pName VARCHAR, UNIQUE(pName));");
+                "ContactPerson(ID INTEGER PRIMARY KEY AUTOINCREMENT, pName VARCHAR, UNIQUE(pName));");
         initialStatements.add("CREATE TABLE IF NOT EXISTS " +
-                "ContactDTO(contactDateID INTEGER, personID INTEGER, FOREIGN KEY (contactDateID) REFERENCES ContactDateDTO (contactDateID), "
-                + "FOREIGN KEY (personID) REFERENCES PersonDTO (personID), UNIQUE(contactDateID, personID));");
+                "Contact(contactDateID INTEGER, contactPersonID INTEGER, FOREIGN KEY (contactDateID) REFERENCES ContactDate (contactDateID), "
+                + "FOREIGN KEY (contactPersonID) REFERENCES ContactPerson (contactPersonID), UNIQUE(contactDateID, contactPersonID));");
         try {
             connectionService.bootstrapDatabase(connection, initialStatements);
         } catch (SQLException sqlException) {

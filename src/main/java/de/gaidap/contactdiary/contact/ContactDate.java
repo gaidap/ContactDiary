@@ -1,13 +1,15 @@
 package de.gaidap.contactdiary.contact;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Objects;
 
-public class ContactDateDTO {
+public class ContactDate {
 
     private int contactDateId;
     private String date;
 
-    public ContactDateDTO(int contactDateId, String date) {
+    public ContactDate(int contactDateId, String date) {
         this.contactDateId = contactDateId;
         this.date = date;
     }
@@ -28,11 +30,16 @@ public class ContactDateDTO {
         this.date = date;
     }
 
+    public static ContactDate createContactDate(ResultSet result) throws SQLException {
+        return new ContactDate(result.getInt("cdID"),
+                result.getString("cDate"));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ContactDateDTO that = (ContactDateDTO) o;
+        ContactDate that = (ContactDate) o;
         return contactDateId == that.contactDateId;
     }
 
@@ -43,7 +50,7 @@ public class ContactDateDTO {
 
     @Override
     public String toString() {
-        return "ContactDateDTO{" +
+        return "ContactDate{" +
                 "contactDateId=" + contactDateId +
                 ", date='" + date + '\'' +
                 '}';
